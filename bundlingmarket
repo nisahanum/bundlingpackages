@@ -1,0 +1,72 @@
+marketbasketanalyst
+koding untuk mengecek paket bundling pada supermarket
+
+[] from sympy import * from itertools import combinations init_printing()
+
+[] #function untuk generate subsets dari full set def subsets(S, k): return [set(s) s in combinations(S, k)]
+
+[] subsets({1,2,3,4}, 2)
+
+[] def print_all(iterable): for item in iterable: print(item)
+
+[] print_all([1,2,3])
+
+[] #contoh dataset T = [ {'Bread', 'Milk'}, {'Beer', 'Bread', 'Diaper', 'Eggs'}, {'Beer', 'Coke', 'Diaper', 'Milk'}, {'Beer', 'Bread', 'Diaper', 'Milk'}, {'Bread', 'Coke', 'Diaper', 'Milk'}, {'Bread', 'Coke', 'Diaper', 'Eggs'}, {'Bread', 'Coke', 'Diaper', 'Milk'}, {'Eggs', 'Diaper', 'Milk'}, ] T
+
+[] #Rumus Support def support_count(X, T): return S(sum(1 for x in T if X <= x)) #s >= t test whether every elemen in t is in s, if true t is a subset a #s | t new set with elements from both s and t
+
+s & t new set with element common to s and t
+#s - t new set with elements in s but not in t
+
+s ^ t new set with elements in either s or t but not both
+[] def support(X, T): return support_count(X, T)/ len(T) #rumus untuk menghitung support #BERAPA KALI MUNCUL DIBAGI TOTAL TRANSAKSI
+
+[] support_count({'Milk','Bread','Diaper'}, T)
+
+[] support({'Milk', 'Bread', 'Diaper'}, T)
+
+[] rule =({'Milk', 'Diaper'}, {'Beer'}) rule_X={'Milk', 'Diaper'} rule_Y ={'Beer'}
+
+[] def rule_support(x,y,T): return support(x|y,T)
+
+[] def rule_confidence(x,y,T): return (support_count(x | y,T) / support_count(x, T))
+
+[] rule_confidence(rule_X,rule_Y, T)
+
+[] T
+
+[] smin = 0.2 #memfilter barang yang muncul minimal tidak harus 50 boleh dibawah 50 cmin = 0.3
+
+[] def union_all(sets): """find the union of given sets""" result = set() for c in sets: result = result | c return result
+
+[] union_all(T) #bisa dilihat di item beer ini jika nilai supportnya lebih besar dari 0.2 maka akan dihitung jika nilai nya kecil dari 0.2 tidak akan dihitung
+
+[] def frequent_1(T): items = union_all(T) return [{item} for item in items if support({item}, T) >= smin]
+
+[] smin L1 = frequent_1(T) L1
+
+[] smin=0.2 #boleh diganti 0.5 jika ingin strict L1 = frequent_1(T) L1
+
+[] #untuk program pengembangan 2 item set dari 1 set,misal {'coke ,diaper'} {'coke,bread'} {'coke,beer'} #panggil lagi union allnya terlebih dahulu union_all(L1)
+
+[] C2 = subsets(_, 2) #c2 adalah combinasi DARI l1 print_all(C2)
+
+[] def good_candidate(c, P): for s in subsets(c, len(c) - 1): if s not in P: return false return True
+
+[] F2 = [c for c in C2 if good_candidate(c, L1)] print_all(F2)
+
+[] L2 = [f for f in F2 if support(f, T) >= smin] #INI LIST good candidate YANG LOLOS RUMUS support MIN = 0.2 print_all(L2)
+
+[] def generate_candidates(P, k): return subsets(union_all(P), k)
+
+[] C3 = generate_candidates(L2, 3) print_all(C3)
+
+[] F3 = [c for c in C3 #ini good candidate yang lolos ada di l2 dan frequen item set rumus min if good_candidate(c, L2)] print_all(F3)
+
+[] L3 = [f for f in F3 #ini unit combinasi ga ada yg di repeat if support(f, T) >= smin] print_all(L3)
+
+[] def frequent_k(P, k, T): C = generate_candidates(P, k) F = [c for c in C if good_candidate(c, P)] return [f for f in F if support(f, T) >= smin]
+
+[] L4 = frequent_k(L3, 4, T) L4
+
+[] L5 = frequent_k(L3, 5, T) L5
